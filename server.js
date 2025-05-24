@@ -39,17 +39,24 @@ app.use('/blogs', createProxyMiddleware({ target: process.env.BLOG_SERVICE_URL, 
 app.use('/comments', createProxyMiddleware({ target: process.env.COMMENTS_SERVICE_URL, changeOrigin: true, pathRewrite: { '^/comments': '' } }));
 app.use('/profile', createProxyMiddleware({ target: process.env.PROFILE_SERVICE_URL, changeOrigin: true, pathRewrite: { '^/profile': '' } }));
 
+// Health and readiness endpoints
+app.get('/healthz', (req, res) => res.status(200).json({ status: 'ok' }));
+app.get('/readyz', (req, res) => res.status(200).json({ ready: true }));
+
 app.listen(process.env.PORT || 3000, () => console.log('API Gateway running'));
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Internal server error' });
 });
+
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   process.exit(1);
 });
+
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
