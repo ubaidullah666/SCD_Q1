@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  api-gateway:
+    build: ./SCD_Q1
+    ports:
+      - "3000:3000"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SERVICE_URL=http://auth-service:4000
+      - BLOG_SERVICE_URL=http://blog-service:4001
+      - COMMENTS_SERVICE_URL=http://comments-service:4002
+      - PROFILE_SERVICE_URL=http://profile-service:4003
+    depends_on:
+      - auth-service
+      - blog-service
+      - comments-service
+      - profile-service
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${AUTH_MONGO_URI}
+    ports:
+      - "4000:4000"
+
+  blog-service:
+    build: ./blog-service
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${BLOG_MONGO_URI}
+    ports:
+      - "4001:4001"
+
+  comments-service:
+    build: ./comments-service
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${COMMENTS_MONGO_URI}
+    ports:
+      - "4002:4002"
+
+  profile-service:
+    build: ./profile-service
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${PROFILE_MONGO_URI}
+    ports:
+      - "4003:4003"
+
+  # Example MongoDB service for local dev
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
