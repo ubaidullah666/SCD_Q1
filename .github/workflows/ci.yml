@@ -28,17 +28,17 @@ jobs:
           node-version: 20
 
       # API Gateway
-      # - name: Install dependencies (API Gateway)
-      #   working-directory: ./SCD_Q1
-      #   run: npm ci
+      - name: Install dependencies (API Gateway)
+        working-directory: ./SCD_Q1
+        run: npm ci
 
-      # - name: Run tests (API Gateway)
-      #   working-directory: ./SCD_Q1
-      #   run: npm test || echo "No tests for API Gateway"
+      - name: Run tests (API Gateway)
+        working-directory: ./SCD_Q1
+        run: npm test || echo "No tests for API Gateway"
 
-      # - name: Build Docker image (API Gateway)
-      #   working-directory: ./SCD_Q1
-      #   run: docker build -t api-gateway .
+      - name: Build Docker image (API Gateway)
+        working-directory: ./SCD_Q1
+        run: docker build -t api-gateway .
 
       # Blog Service
       - name: Install dependencies (Blog Service)
