@@ -1,0 +1,80 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    env:
+      JWT_SECRET: testsecret
+      AUTH_SERVICE_URL: http://localhost:4000
+      BLOG_SERVICE_URL: http://localhost:4001
+      COMMENTS_SERVICE_URL: http://localhost:4002
+      PROFILE_SERVICE_URL: http://localhost:4003
+      MONGO_URI: mongodb://localhost:27017/testdb
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # API Gateway
+      - name: Install dependencies (API Gateway)
+        working-directory: ./SCD_Q1
+        run: npm ci
+
+      - name: Run tests (API Gateway)
+        working-directory: ./SCD_Q1
+        run: npm test || echo "No tests for API Gateway"
+
+      - name: Build Docker image (API Gateway)
+        working-directory: ./SCD_Q1
+        run: docker build -t api-gateway .
+
+      # Blog Service
+      - name: Install dependencies (Blog Service)
+        working-directory: ./blog-service
+        run: npm ci
+
+      - name: Run tests (Blog Service)
+        working-directory: ./blog-service
+        run: npm test
+
+      - name: Build Docker image (Blog Service)
+        working-directory: ./blog-service
+        run: docker build -t blog-service .
+
+      # Comment Service
+      - name: Install dependencies (Comment Service)
+        working-directory: ./comments-service
+        run: npm ci
+
+      - name: Run tests (Comment Service)
+        working-directory: ./comments-service
+        run: npm test
+
+      - name: Build Docker image (Comment Service)
+        working-directory: ./comments-service
+        run: docker build -t comments-service .
+
+      # Profile Service
+      - name: Install dependencies (Profile Service)
+        working-directory: ./profile-service
+        run: npm ci
+
+      - name: Run tests (Profile Service)
+        working-directory: ./profile-service
+        run: npm test
+
+      - name: Build Docker image (Profile Service)
+        working-directory: ./profile-service
+        run: docker build -t profile-service .
