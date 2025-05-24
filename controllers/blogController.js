@@ -1,5 +1,13 @@
-const Blog = require('../models/Blog');
-const View = require('../models/View');
+const mongoose = require('mongoose');
+
+const blogSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('Blog', blogSchema);
 
 // Create Blog
 exports.createBlog = async (req, res) => {
@@ -34,4 +42,16 @@ exports.incrementViews = async (req, res) => {
   }
 
   res.status(200).json({ message: 'View count incremented' });
+};
+
+// Delete Blog (only creator)
+exports.deleteBlog = async (req, res) => {
+  const { blogId } = req.params;
+  const blog = await Blog.findById(blogId);
+  if (!blog) return res.status(404).json({ message: 'Blog not found' });
+  if (blog.author.toString() !== req.userId) {
+    return res.status(403).json({ message: 'Not authorized' });
+  }
+  await Blog.deleteOne({ _id: blogId });
+  res.json({ message: 'Blog deleted' });
 };
