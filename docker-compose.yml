@@ -48,7 +48,6 @@ services:
     ports:
       - "4003:4003"
 
-  # Example MongoDB service for local dev
   mongo:
     image: mongo:7
     ports:
